@@ -70,7 +70,7 @@ class PictureSerializer(serializers.ModelSerializer):
 
         picture_obj: Picture = Picture.objects.create(album=self.context.get("view").kwargs.get("id"), **validated_data)
 
-        # Preparing Captions objects for each Picture
+        # Preparing Captions objects for Picture
         captions_objs = list(map(lambda caption_data: Caption(picture=picture_obj, **caption_data), captions_set))
 
         Caption.objects.bulk_create(captions_objs)

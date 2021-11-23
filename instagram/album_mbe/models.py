@@ -64,3 +64,9 @@ class UserSimilarity(models.Model):
 class UserFollows(models.Model):
     user                = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     follows             = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="followed_by")
+
+    class Meta:
+        unique_together = (
+            "user",
+            "follows"
+        )

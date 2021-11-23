@@ -16,7 +16,7 @@ class AlbumListCreateAPIView(ListCreateAPIView):
         return {"view": self}
 
     def get_queryset(self):
-        return Album.objects.filter(Q(user=self.request.user) | Q(draft=False))
+        return Album.objects.filter(Q(user=self.request.user) | Q(draft=False)).filter(is_deleted=False)
 
     def perform_create(self, serializer):
 
