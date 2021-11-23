@@ -1,11 +1,12 @@
 from album_mbe.models import User, UserSimilarity
 from album_mbe.serializers.user import UserRegistrationSerializer
-from instagram.album_mbe.models import UserFollows
+from album_mbe.models import UserFollows
 
 from rest_framework import status
 from rest_framework.generics import CreateAPIView, ListAPIView
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
 class UserRegistrationCreateAPIView(CreateAPIView):
@@ -21,10 +22,10 @@ class UserSimilarListAPIView(ListAPIView):
         return UserSimilarity.objects.filter(user=self.request.user, similarity_score__gte=70)
 
 
-class UserFollowCreateAPIView(CreateAPIView):
+class UserFollowCreateAPIView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
 
         follow_user_id = kwargs.get("id")
 
@@ -35,7 +36,7 @@ class UserFollowCreateAPIView(CreateAPIView):
 
             return Response(data={"detail": "Followed User not found!"}, status=status.HTTP_400_BAD_REQUEST)
 
-        queryset = UserFollows.objects.filter(user=request.user, follow_id=follow_user_id)
+        queryset = UserFollows.objects.filter(user=request.user, follows_id=follow_user_id)
 
         # If already followed
         if queryset.exists():
