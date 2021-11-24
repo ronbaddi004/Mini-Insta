@@ -1,8 +1,7 @@
 from typing import Dict, List
 from rest_framework import serializers
 
-from album_mbe.models import Album, User, HashTag, Caption
-from album_mbe.models import Caption, Picture
+from album_mbe.models import Album, User, HashTag
 from album_mbe.serializers.picture import PictureSerializer
 
 

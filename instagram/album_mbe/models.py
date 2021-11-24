@@ -43,17 +43,6 @@ class Picture(models.Model):
     image               = models.ImageField(upload_to=picture_directory_path, max_length=1000)
 
 
-class Caption(models.Model):
-    picture: Picture    = models.ForeignKey(Picture, on_delete=models.PROTECT, related_name="captions")
-
-    # Caption Properties
-    text: str           = models.CharField(max_length=100)
-    color: str          = models.CharField(max_length=16)
-    x_pos: int          = models.IntegerField()
-    y_pos: int          = models.IntegerField()
-    size: int           = models.IntegerField()
-
-
 class UserSimilarity(models.Model):
     user                = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     similar_user        = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name="similar_user")

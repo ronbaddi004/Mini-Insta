@@ -1,19 +1,20 @@
 from rest_framework import serializers
 
-from album_mbe.models import Caption, Picture, Album
+from PIL import Image, ImageDraw, ImageFont
+
+from album_mbe.models import Picture, Album
 
 
-class CaptionSerializer(serializers.ModelSerializer):
+class CaptionSerializer(serializers.Serializer):
     id                      = serializers.IntegerField(read_only=True)
 
     text                    = serializers.CharField(max_length=100)
-    color                   = serializers.CharField(max_length=16)
+    color                   = serializers.ListField(child=serializers.IntegerField(max_value=255), max_length=3)
     x_pos                   = serializers.IntegerField()
     y_pos                   = serializers.IntegerField()
     size                    = serializers.IntegerField()
 
     class Meta:
-        model = Caption
         fields = [
             "id",
 
@@ -30,7 +31,7 @@ class PictureSerializer(serializers.ModelSerializer):
 
     image                   = serializers.ImageField(max_length=1000)
 
-    captions                = CaptionSerializer(many=True)
+    captions                = CaptionSerializer(many=True, write_only=True)
 
     class Meta:
         model = Picture
@@ -58,11 +59,18 @@ class PictureSerializer(serializers.ModelSerializer):
         # Popping Captions
         captions_set: list = validated_data.pop("captions")
 
-        picture_obj: Picture = Picture.objects.create(album=self.context.get("view").kwargs.get("id"), **validated_data)
+        img = validated_data.pop("image")
 
-        # Preparing Captions objects for Picture
-        captions_objs = list(map(lambda caption_data: Caption(picture=picture_obj, **caption_data), captions_set))
+        I1 = ImageDraw.Draw(img)
 
-        Caption.objects.bulk_create(captions_objs)
+        for caption_data in captions_set:
+
+            font_type = ImageFont.truetype(size=caption_data.get("size"))
+
+            I1.text((caption_data.get("x_pos"), caption_data.get("y_pos")), caption_data.get("text"), caption_data.get("color"), font=font_type)
+
+        img.save()
+
+        picture_obj: Picture = Picture.objects.create(album=self.context.get("view").kwargs.get("id"), image=img, **validated_data)
 
         return picture_obj
